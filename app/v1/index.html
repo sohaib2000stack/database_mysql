@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>User Details Form</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        #container {
+            width: 50%;
+            margin: 50px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            border: none;
+            border-radius: 3px;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        .notification {
+            position: absolute;
+            top: -50px;
+            right: 10px;
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px 15px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            display: none;
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <h2>User Details Form</h2>
+        <form id="myForm">
+            <label for="id">ID:</label>
+            <input type="number" id="id" name="id" required><br>
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required><br>
+            <label for="age">Age:</label>
+            <input type="number" id="age" name="age" required><br>
+            <label for="year">Year:</label>
+            <input type="number" id="year" name="year" required><br>
+            <label for="address">Address:</label>
+            <input type="text" id="address" name="address" required><br><br>
+            <input type="submit" value="Submit">
+        </form>
+        <div class="notification" id="notification"></div>
+    </div>
+    <script>
+        $(document).ready(function () {
+            $('#myForm').submit(async function (event) {
+                event.preventDefault(); // Prevent the default form submission
+
+                // Get form values
+                const id = parseInt($('#id').val());
+                const name = $('#name').val();
+                const age = parseInt($('#age').val());
+                const year = parseInt($('#year').val());
+                const address = $('#address').val();
+
+                // Create an object with the form data
+                const data = {
+                    id: id,
+                    name: name,
+                    age: age,
+                    year: year,
+                    address: address
+                };
+
+                try {
+                    // Send a POST request to the API
+                    const response = await fetch('http://127.0.0.1:8000/api/v1/save_data', {
+                        method: 'POST',
+                        body: new FormData(document.getElementById('myForm'))
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to insert record');
+                    }
+
+                    const result = await response.json();
+                    $('#notification').html('Record inserted successfully: ' + JSON.stringify(result)).removeClass('error').addClass('success').slideDown();
+
+                    // Optionally, reset the form after successful submission
+                    $('#myForm')[0].reset();
+
+                    // Hide the notification after 5 seconds
+                    setTimeout(function () {
+                        $('#notification').slideUp();
+                    }, 5000);
+
+                } catch (error) {
+                    $('#notification').html('Error: ' + error.message).removeClass('success').addClass('error').slideDown();
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
+
