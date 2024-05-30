@@ -1,4 +1,4 @@
-import uvicorn
+
 from app import app
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -12,4 +12,5 @@ app.add_middleware(
 
 
 if __name__ == "__main__":
+    import uvicorn
     uvicorn.run('main:app', reload=True, host="0.0.0.0", port=8000)

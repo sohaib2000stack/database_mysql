@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Data</title>
+</head>
+
+<body>
+    <h1>Update Data</h1>
+    <form id="update-form">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required><br><br>
+        <label for="age">Age:</label>
+        <input type="number" id="age" name="age" required><br><br>
+        <label for="year">Year:</label>
+        <input type="number" id="year" name="year" required><br><br>
+        <label for="address">Address:</label>
+        <input type="text" id="address" name="address" required><br><br>
+        <input type="submit" value="Update">
+    </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Get the row data from session storage
+            const rowData = JSON.parse(sessionStorage.getItem('rowData'));
+            console.log(rowData)
+            // Fill the form with the row data
+            document.getElementById('name').value = rowData.name;
+            document.getElementById('age').value = rowData.age;
+            document.getElementById('year').value = rowData.year;
+            document.getElementById('address').value = rowData.address;
+
+            // Submit form on submit
+            document.getElementById('update-form').addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                const formData = new FormData();
+                formData.set("name", document.getElementById('name').value);
+                formData.set("age", parseInt(document.getElementById('age').value));
+                formData.set("year", parseInt(document.getElementById('year').value));
+                formData.set("address", document.getElementById('address').value);
+
+                try {
+                    const response = await fetch(`http://127.0.0.1:8000/api/v1/update_data/${rowData.id}`, {
+                        method: 'PUT',
+                        body: formData
+
+                    });
+                    if (!response.ok) {
+                        throw new Error('Failed to update data');
+                    }
+                    alert('Data updated successfully');
+                    // Redirect back to data page
+                    location.href = 'data.html';
+                } catch (error) {
+                    console.error('Error updating data:', error);
+                    alert('Failed to update data.');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
