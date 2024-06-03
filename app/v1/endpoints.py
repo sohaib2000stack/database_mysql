@@ -1,6 +1,7 @@
 
 from fastapi import APIRouter, HTTPException, Form
 from fastapi.responses import JSONResponse
+# from passlib.context import CryptContext  # For hashing passwords
 import mysql.connector
 
 router = APIRouter()
@@ -89,6 +90,34 @@ async def get_row_data(user_id: int):
         mycursor.close()
         mydb.close()
 
+
+# pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def get_db_connection():
+    # Connect to your MySQL database
+    return mysql.connector.connect(user='root', password='',
+                                    host='127.0.0.1', database='test2')
+
+@router.post("/signup")
+async def signup(name: str = Form(...), email: str = Form(...), password: str = Form(...)):
+    try:
+        mydb = get_db_connection()
+        mycursor = mydb.cursor()
+
+        # Hash the password
+        # hashed_password = pwd_context.hash(password)
+
+        sql = "INSERT INTO users (name, email, password) VALUES (%s, %s, %s)"
+        val = (name, email, password)
+
+        mycursor.execute(sql, val)
+        mydb.commit()
+        return {"message": f"User {name} signed up successfully."}
+    except mysql.connector.Error as err:
+        return {"message": f"Error signing up: {err}"}
+    finally:
+        mycursor.close()
+        mydb.close()
 
 
 
