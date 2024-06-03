@@ -1,70 +1,9 @@
-# from fastapi import APIRouter, HTTPException, Form, Request
-# from fastapi.responses import HTMLResponse
-# import mysql.connector
-# import logging
-
-# router = APIRouter()
-
-# def get_db_connection():
-#     # Connect to your MySQL database
-#     return mysql.connector.connect(user='root', password='',
-#                                     host='127.0.0.1', database='test2')
-
-# @router.get("/", response_class=HTMLResponse)
-# async def get_form():
-#     with open("index.html", "r") as form_file:
-#         form = form_file.read()
-#     return form
-
-# @router.post("/save_data")
-# async def save_data(id: int = Form(...), name: str = Form(...), age: int = Form(...), year: int = Form(...), address: str = Form(...)):
-#     try:
-#         mydb = get_db_connection()
-#         mycursor = mydb.cursor()
-
-#         sql = "INSERT INTO employee (id, name, age, year, Address) VALUES (%s, %s, %s, %s, %s)"
-#         val = (id, name, age, year, address)
-
-#         mycursor.execute(sql, val)
-#         mydb.commit()
-#         return {"message": f"{mycursor.rowcount} record inserted."}
-#     except mysql.connector.Error as err:
-#         return {"message": f"Error inserting record: {err}"}
-#     finally:
-#         mycursor.close()
-#         mydb.close()
-
-# @router.get("/data", response_class=HTMLResponse)
-# async def get_data():
-#     try:
-#         mydb = get_db_connection()
-#         mycursor = mydb.cursor(dictionary=True)
-#         mycursor.execute("SELECT * FROM employee")
-#         data = mycursor.fetchall()
-#         return {"data": data}
-#     except mysql.connector.Error as err:
-#         print(f"Error fetching data: {err}")  # Print the error for debugging
-#         return {"message": f"Error fetching data: {err}"}
-#     finally:
-#         mycursor.close()
-#         mydb.close()
-
-
-
 
 from fastapi import APIRouter, HTTPException, Form
-from fastapi.responses import HTMLResponse
-from pydantic import BaseModel
+from fastapi.responses import JSONResponse
 import mysql.connector
-import json 
-router = APIRouter()
 
-class Employee(BaseModel):
-    id: int
-    name: str
-    age: int
-    year: int
-    address: str
+router = APIRouter()
 
 def get_db_connection():
     # Connect to your MySQL database
@@ -89,26 +28,24 @@ async def save_data(id: int = Form(...), name: str = Form(...), age: int = Form(
         mycursor.close()
         mydb.close()
 
-@router.get("/get_data", response_class=HTMLResponse)
-async def get_form():
+@router.get("/get_data")
+async def get_data():
     try:
         mydb = get_db_connection()
         mycursor = mydb.cursor(dictionary=True)
         mycursor.execute("SELECT * FROM employee")
         data = mycursor.fetchall()
-        response_data = json.dumps(data)
-        return response_data 
-        return data
+        return JSONResponse(content=data)
     except mysql.connector.Error as err:
         print(f"Error fetching data: {err}")
-        return {"message": f"Error fetching data: {err}"}
+        return JSONResponse(content={"message": f"Error fetching data: {err}"}, status_code=500)
     finally:
         mycursor.close()
         mydb.close()
+
 @router.put("/update_data/{user_id}")
 async def update_data(user_id: int, name: str = Form(...), age: int = Form(...), year: int = Form(...), address: str = Form(...)):
     try:
-        print(user_id)
         mydb = get_db_connection()
         mycursor = mydb.cursor()
 
@@ -151,3 +88,9 @@ async def get_row_data(user_id: int):
     finally:
         mycursor.close()
         mydb.close()
+
+
+
+
+
+

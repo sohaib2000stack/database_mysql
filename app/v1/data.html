@@ -127,10 +127,12 @@
             }
         }
 
+        // Call fetchData when the page loads
         document.addEventListener('DOMContentLoaded', () => {
             fetchData();
         });
 
+        // Function to handle edit button click
         async function editRow(id) {
             try {
                 const response = await fetch(`http://127.0.0.1:8000/api/v1/get_row_data/${id}`);
@@ -144,13 +146,12 @@
                 sessionStorage.setItem('rowData', JSON.stringify(data));
 
                 // Redirect to update form
-                location.href = `update.html?user_id=${id}`;
+                location.href = 'update.html';
             } catch (error) {
                 console.error('Error editing row:', error);
                 alert('Failed to fetch data for editing.');
             }
         }
-
 
     </script>
 </body>
